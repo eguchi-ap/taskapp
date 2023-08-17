@@ -92,15 +92,45 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.reloadData()
     }
     
+    func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let searchText = searchBar.text!
+            self.searchCategory(searchText)
+        }
+        return true
+    }
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         view.endEditing(true)
-        if let word = searchBar.text {
-            getByCategory(word)
+        
+        let word: String = searchBar.text!
+        self.searchCategory(word)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        // サーチバーでバツボタンを押された時を想定
+        if searchText.isEmpty {
+            reloadTable()
         }
     }
     
     func getByCategory(_ category: String) {
         taskArray = try! Realm().objects(Task.self).where({ $0.category == "\(category)" }).sorted(byKeyPath: "date", ascending: true)
         tableView.reloadData()
+    }
+    
+    func searchCategory(_ category: String) {
+        if category.isEmpty || category == "" {
+            self.reloadTable()
+            return
+        }
+        
+        self.taskArray = try! Realm().objects(Task.self).where({ $0.category == "\(category)" }).sorted(byKeyPath: "date", ascending: true)
+        self.tableView.reloadData()
+    }
+    
+    func reloadTable() {
+        self.taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)
+        self.tableView.reloadData()
     }
 }
