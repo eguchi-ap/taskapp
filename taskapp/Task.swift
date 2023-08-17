@@ -12,4 +12,5 @@ class Task: Object {
     @Persisted var title = ""
     @Persisted var contents = ""
     @Persisted var date = Date()
+    @Persisted var category = ""
 }
